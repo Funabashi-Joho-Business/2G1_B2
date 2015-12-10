@@ -127,7 +127,7 @@ public class Ajax10 extends HttpServlet {
         response.setContentType("text/plain; charset=UTF-8");
         PrintWriter out = response.getWriter();
 
-        //記事の受け取り＆送信処理
+    //記事の受け取り＆送信処理
         RecvData recvData = null;
         try {
 			recvData = JSON.decode(request.getInputStream(),RecvData.class);

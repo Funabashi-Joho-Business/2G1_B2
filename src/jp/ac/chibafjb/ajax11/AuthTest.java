@@ -58,7 +58,7 @@ public class AuthTest extends HttpServlet {
             }
         }
 
-         //出力ストリームの作成
+         //出力ストリームの作成1
         response.setCharacterEncoding("UTF-8");
         response.setContentType("text/plain; charset=UTF-8");
         PrintWriter out = response.getWriter();
@@ -66,6 +66,12 @@ public class AuthTest extends HttpServlet {
         String json = JSON.encode(retData);
         //出力
         out.println(json);
-    }
+
+//      //出力ストリームの作成2;
+//		//JSONデータの作成
+//		String json2 = JSON.encode(userName);
+//		//出力
+//		out.println(json2);
+	}
 
 }

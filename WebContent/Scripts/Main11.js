@@ -115,7 +115,7 @@ function start() {
 
 function Main() {
 	// タイトルの設定
-	document.title = "B team";
+	document.title = "すべてがFになる";
 	start();
 
 }

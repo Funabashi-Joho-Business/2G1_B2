@@ -1,8 +1,26 @@
 //ページ読み込みイベントに登録
 document.addEventListener("DOMContentLoaded", Main, false);
 
-function Main()
-{
+function kakunin(btnNo){
+	  if (btnNo == 1){
+	    link = "Yahoo!Japan";
+	    href = "story.html";
+	  }else{
+	    link = "Google";
+	    href = "story.html";
+	  }
+
+	  ret = confirm(link + "へ飛びます。宜しいですか？");
+	  if (ret == true){
+	    location.href = href;
+	  }
+	}
+
+//function Main()
+//{
+
+
+
 	//セレクターで各要素のインスタンスを取得
 	//var output = document.querySelector("div.aaa");
 
@@ -106,4 +124,4 @@ function Main()
 //	//データ受信要求
 ////	var sendData = {"cmd":"read3"};
 ////	AFL.sendJson("Ajax10",sendData,onRecv3);
-}
+//}

@@ -16,10 +16,17 @@ function kakunin(btnNo){
 	  }
 	}
 
+	function onClick()
+	{
 		var sendData = {"cmd":"read"};
-		sendData.btnNo = {};
-		sendData.gakuseiId = {};
-		AFL.sendJson("Ajax10",sendData,kakunin);
+		sendData.ichiranRecv = {};
+		sendData.ichiranRecv.id = this.id;
+		AFL.sendJson("Ajax10",sendData,onRecv2);
+		//データ受信要求
+		//var sendData = {"cmd":"read3"};
+		//AFL.sendJson("Ajax10",sendData,onRecv3);
+
+	}
 
 //function Main()
 //{

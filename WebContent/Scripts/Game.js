@@ -16,6 +16,11 @@ function kakunin(btnNo){
 	  }
 	}
 
+		var sendData = {"cmd":"read"};
+		sendData.btnNo = {};
+		sendData.gakuseiId = {};
+		AFL.sendJson("Ajax10",sendData,kakunin);
+
 //function Main()
 //{
 

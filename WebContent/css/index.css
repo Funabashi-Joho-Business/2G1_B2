@@ -1,14 +1,15 @@
 
 .aaa{
 	width: 800px;
-	height:600px;  
-	border: 1px solid #000;  
-	margin: 50px auto;  
+	height:600px;
+	border: 1px solid #000;
+	margin: 50px auto;
 }
 
 .bbb{
-	width:798px;
+	width:750px;
 	height:200px;
-	border:1px solid #000;  
+	border:1px solid #000;
 	margin-top:380px;
+	margin-left:24px;
 }

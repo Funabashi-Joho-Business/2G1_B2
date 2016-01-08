@@ -3,14 +3,14 @@ document.addEventListener("DOMContentLoaded", Main, false);
 
 function kakunin(btnNo){
 	  if (btnNo == 1){
-	    link = "Yahoo!Japan";
+	    link = "はじめから";
 	    href = "story.html";
 	  }else{
-	    link = "Google";
+	    link = "つづきから";
 	    href = "story.html";
 	  }
 
-	  ret = confirm(link + "へ飛びます。宜しいですか？");
+	  ret = confirm(link + "でよろしいですか？");
 	  if (ret == true){
 	    location.href = href;
 	  }

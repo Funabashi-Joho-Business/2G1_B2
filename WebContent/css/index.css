@@ -11,13 +11,15 @@
 	height:200px;
 	border:1px solid #000;
 	margin-top:380px;
-<<<<<<< HEAD
 	margin-left:24px;
-=======
+
 }
 
 .login{
 	align: center;
 	margin-top:300px;
->>>>>>> dc35be1c0df726c3b5ea9b2bcfd980a7fbbb8de8
+}
+
+#select{
+	color: red;
 }

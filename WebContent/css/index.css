@@ -5,6 +5,9 @@
 	border: 1px solid #000;
 	margin: 50px auto;
 }
+.aaa #login{
+	margin-top:280px;
+}
 
 .bbb{
 	width:750px;
@@ -18,8 +21,4 @@
 .login{
 	align: center;
 	margin-top:300px;
-}
-
-#select{
-	color: red;
 }

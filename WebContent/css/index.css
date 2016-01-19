@@ -1,24 +1,27 @@
 
-.aaa{
+
+#aaa{
 	width: 800px;
 	height:600px;
 	border: 1px solid #000;
 	margin: 50px auto;
 }
-.aaa #login{
+#aaa #login{
 	margin-top:280px;
 }
 
-.bbb{
+#bbb{
 	width:750px;
 	height:200px;
 	border:1px solid #000;
 	margin-top:380px;
 	margin-left:24px;
+	font: bold large/150% "‚l‚r –¾’©";
 
 }
 
-.login{
+
+#login{
 	align: center;
 	margin-top:300px;
 }

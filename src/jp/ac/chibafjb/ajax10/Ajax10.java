@@ -13,53 +13,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.arnx.jsonic.JSON;
-import net.arnx.jsonic.JSONException;
 
-class IchiranSend
-{
-	public int id;
-	public String title;
-}
-
-class IchiranRecv
-{
-	public int id;
-}
-
-class KijiSend
-{
-	public int id;
-	public String title;
-	public String news;
-
-	public ArrayList<SendData> list = new ArrayList<SendData>();
-}
-
-class RecvData
-{
-	public String cmd;
-	public IchiranRecv ichiranRecv;
-	public RecvData2 recv;
-
-}
-
-class RecvData2
+class UserData
 {
 	public String cmd;
 	public String name;
-	public String msg;
 }
 
-class SendData
+class PageNo
 {
 	public int id;
-	public String name;
-	public String msg;
+	public String scenario;
 }
 
-/**
- * Servlet implementation class Ajax10
- */
+
+
 @WebServlet("/Ajax10")
 public class Ajax10 extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -85,16 +53,11 @@ public class Ajax10 extends HttpServlet {
 
 			//テーブルが無ければ作成
 
-			if(!mOracle.isTable("db_kigi")&& !mOracle.isTable("db_exam"))
-
-
-			if(!mOracle.isTable("db_exam10")/*&&!mOracle.isTable("db_coment01")*/)
-
-			if(/*!mOracle.isTable("db_kigi")&&*/ !mOracle.isTable("db_exam10"))
+			if(!mOracle.isTable("User_DB")&& !mOracle.isTable("Scenario_DB"))
 
 			{
-				mOracle.execute("create table db_game(id number,story varchar2(4000))");
-				mOracle.execute("create table db_exam(gakuseki varchar2(200),msg story_id number)");
+				mOracle.execute("create table User_DB(name varchar2(10),id_2 number)");
+				mOracle.execute("create table Scenario_DB (id_1 number,scenario varchar2(4000))");
 			}
 		} catch (Exception e) {
 			System.err.println("認証に失敗しました");
@@ -127,148 +90,143 @@ public class Ajax10 extends HttpServlet {
         response.setContentType("text/plain; charset=UTF-8");
         PrintWriter out = response.getWriter();
 
-    //記事の受け取り＆送信処理
-        RecvData recvData = null;
-        try {
-			recvData = JSON.decode(request.getInputStream(),RecvData.class);
-		} catch (Exception e1) {
-		}
+    //データ受け取り
+        UserData userData = JSON.decode(request.getInputStream(),UserData.class);
 
-
-
-
-        //記事一覧
-        if(recvData == null || recvData.cmd.equals("read"))
+        //はじめからのシナリオ読み込み
+        if(userData.cmd.equals("read1"))
         {
-        	//一覧受け取り
-            try {
-    			//データの送信処理
-    			ArrayList<IchiranSend> list3 = new ArrayList<IchiranSend>();
-    			ResultSet res = mOracle.query("select * from db_kigi order by id desc");
-    			while(res.next())
-    			{
-    				IchiranSend ichiranSend = new IchiranSend();
-    				ichiranSend.id = res.getInt(1);
-    				ichiranSend.title = res.getString(2);
-    				list3.add(ichiranSend);
-    			}
-    			//JSON形式に変換
-                String json2 = JSON.encode(list3);
-                //出力
-                out.println(json2);
-    		} catch (SQLException e) {
-    			e.printStackTrace();
-    		}
-
-
-
-
-        }else if(recvData.cmd.equals("read2"))
-        {
-        	 KijiSend kijiSend = new KijiSend();
-            //記事内容一覧
-            //記事の受け取り＆送信処理
-            IchiranRecv ichiranRecv = recvData.ichiranRecv;
-           // if("write".equals(ichiranRecv.id))
-            {
-            	String sql = String.format("select * from db_kigi where id = '%d' ",ichiranRecv.id);
-            	ResultSet res = mOracle.query(sql);
-            	try {
-					if(res.next())
+            	ArrayList<PageNo> list = new ArrayList<PageNo>();
+    			//DBからシナリオ読み込み
+    			ResultSet res = mOracle.query("select * from scenario_db where id_l = 1");
+    			try {
+					while(res.next())
 					{
-
-						kijiSend.title = res.getString(2);
-						kijiSend.news = res.getString(3);
-
+						PageNo pageNo = new PageNo();
+						pageNo.id = res.getInt(1);
+						pageNo.scenario = res.getString(2);
+						list.add(pageNo);
 					}
-					res.close();
-				} catch (JSONException e) {
-					// TODO 自動生成された catch ブロック
-					e.printStackTrace();
+	    			//JSON形式に変換
+	                String json = JSON.encode(list);
+	                //出力
+	                out.println(json);
 				} catch (SQLException e) {
 					// TODO 自動生成された catch ブロック
 					e.printStackTrace();
 				}
-
-            }
-
-            try {
-    			//データの送信処理
-    			String sql = String.format("select * from db_exam where kiji_id = '%d'  order by com_id ",ichiranRecv.id);
-    			ResultSet res = mOracle.query(sql);
-    			while(res.next())
-    			{
-    				SendData sendData = new SendData();
-    				sendData.id = res.getInt(2);
-    				sendData.name = res.getString(3);
-    				sendData.msg = res.getString(4);
-    				kijiSend.list.add(sendData);
-    			}
-    			//JSON形式に変換
-    	          String json2 = JSON.encode(kijiSend);
-    	          //出力
-    	            out.println(json2);
-    			} catch (SQLException e) {
-    				e.printStackTrace();
-    			}
-
-        }else if(recvData.cmd.equals("read3"))
-    	{
-        	IchiranRecv ichiranRecv = recvData.ichiranRecv;
-        	KijiSend kijiSend = new KijiSend();
-		//データの受け取り処理
-	       try {
-				if(recvData.recv != null )
-				{
-					//RecvData ichiranRecv = new RecvData();
-					//IchiranRecv ichiranRecv = recvData.ichiranRecv;
-					//書き込み処理
-					String sql = String.format("insert into db_exam values('%d',db_exam_seq.nextval,'%s','%s')",
-							ichiranRecv.id,recvData.recv.name,recvData.recv.msg);
-					mOracle.execute(sql);
-				}
-   			//データの送信処理
-   			String sql = String.format("select * from db_exam where kiji_id = '%d'  order by com_id ",ichiranRecv.id);
-   			ResultSet res = mOracle.query(sql);
-   			while(res.next())
-   			{
-   				SendData sendData = new SendData();
-   				sendData.id = res.getInt(1);
-   				sendData.name = res.getString(3);
-   				sendData.msg = res.getString(4);
-   				kijiSend.list.add(sendData);
-   			}
-   			//JSON形式に変換
-   	          String json2 = JSON.encode(kijiSend);
-   	          //出力
-   	            out.println(json2);
-   			} catch (SQLException e) {
-   				e.printStackTrace();
-   			}
-
-
-	     /* try {
-			//データの送信処理
-	    	  IchiranRecv ichiranRecv = recvData.ichiranRecv;
-			ArrayList<SendData> list2 = new ArrayList<SendData>();
-			String sql = String.format("select * from db_exam where kiji_id = '%d'  order by id ",ichiranRecv.id);
-			ResultSet res = mOracle.query(sql);
-			while(res.next())
-			{
-				SendData sendData = new SendData();
-				sendData.id = res.getInt(1);
-				sendData.name = res.getString(2);
-				sendData.msg = res.getString(3);
-				list2.add(sendData);
-			}
-			//JSON形式に変換
-	          String json2 = JSON.encode(list2);
-	          //出力
-	            out.println(json2);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-*/
-		}
+    		}
 	}
 }
+
+//
+//
+//
+//
+//        }else if(recvData.cmd.equals("read2"))
+//        {
+//        	 KijiSend kijiSend = new KijiSend();
+//            //記事内容一覧
+//            //記事の受け取り＆送信処理
+//            IchiranRecv ichiranRecv = recvData.ichiranRecv;
+//           // if("write".equals(ichiranRecv.id))
+//            {
+//            	String sql = String.format("select * from db_kigi where id = '%d' ",ichiranRecv.id);
+//            	ResultSet res = mOracle.query(sql);
+//            	try {
+//					if(res.next())
+//					{
+//
+//						kijiSend.title = res.getString(2);
+//						kijiSend.news = res.getString(3);
+//
+//					}
+//					res.close();
+//				} catch (JSONException e) {
+//					// TODO 自動生成された catch ブロック
+//					e.printStackTrace();
+//				} catch (SQLException e) {
+//					// TODO 自動生成された catch ブロック
+//					e.printStackTrace();
+//				}
+//
+//            }
+//
+//            try {
+//    			//データの送信処理
+//    			String sql = String.format("select * from db_exam where kiji_id = '%d'  order by com_id ",ichiranRecv.id);
+//    			ResultSet res = mOracle.query(sql);
+//    			while(res.next())
+//    			{
+//    				SendData sendData = new SendData();
+//    				sendData.id = res.getInt(2);
+//    				sendData.name = res.getString(3);
+//    				sendData.msg = res.getString(4);
+//    				kijiSend.list.add(sendData);
+//    			}
+//    			//JSON形式に変換
+//    	          String json2 = JSON.encode(kijiSend);
+//    	          //出力
+//    	            out.println(json2);
+//    			} catch (SQLException e) {
+//    				e.printStackTrace();
+//    			}
+//
+//        }else if(recvData.cmd.equals("read3"))
+//    	{
+//        	IchiranRecv ichiranRecv = recvData.ichiranRecv;
+//        	KijiSend kijiSend = new KijiSend();
+//		//データの受け取り処理
+//	       try {
+//				if(recvData.recv != null )
+//				{
+//					//RecvData ichiranRecv = new RecvData();
+//					//IchiranRecv ichiranRecv = recvData.ichiranRecv;
+//					//書き込み処理
+//					String sql = String.format("insert into db_exam values('%d',db_exam_seq.nextval,'%s','%s')",
+//							ichiranRecv.id,recvData.recv.name,recvData.recv.msg);
+//					mOracle.execute(sql);
+//				}
+//   			//データの送信処理
+//   			String sql = String.format("select * from db_exam where kiji_id = '%d'  order by com_id ",ichiranRecv.id);
+//   			ResultSet res = mOracle.query(sql);
+//   			while(res.next())
+//   			{
+//   				SendData sendData = new SendData();
+//   				sendData.id = res.getInt(1);
+//   				sendData.name = res.getString(3);
+//   				sendData.msg = res.getString(4);
+//   				kijiSend.list.add(sendData);
+//   			}
+//   			//JSON形式に変換
+//   	          String json2 = JSON.encode(kijiSend);
+//   	          //出力
+//   	            out.println(json2);
+//   			} catch (SQLException e) {
+//   				e.printStackTrace();
+//   			}
+//
+//
+//	     /* try {
+//			//データの送信処理
+//	    	  IchiranRecv ichiranRecv = recvData.ichiranRecv;
+//			ArrayList<SendData> list2 = new ArrayList<SendData>();
+//			String sql = String.format("select * from db_exam where kiji_id = '%d'  order by id ",ichiranRecv.id);
+//			ResultSet res = mOracle.query(sql);
+//			while(res.next())
+//			{
+//				SendData sendData = new SendData();
+//				sendData.id = res.getInt(1);
+//				sendData.name = res.getString(2);
+//				sendData.msg = res.getString(3);
+//				list2.add(sendData);
+//			}
+//			//JSON形式に変換
+//	          String json2 = JSON.encode(list2);
+//	          //出力
+//	            out.println(json2);
+//			} catch (SQLException e) {
+//				e.printStackTrace();
+//			}
+//*/
+//		}

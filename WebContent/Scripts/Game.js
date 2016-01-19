@@ -1,38 +1,31 @@
 //ページ読み込みイベントに登録
 document.addEventListener("DOMContentLoaded", Main, false);
 
-function kakunin(btnNo){
-	  if (btnNo == 1){
-	    link = "はじめから";
-	    href = "story.html";
-	  }else{
-	    link = "つづきから";
-	    href = "story.html";
-	  }
-
-	  ret = confirm(link + "でよろしいですか？");
-	  if (ret == true){
-	    location.href = href;
-	  }
+function Main(){
+	link = "はじめから";
+	href = "story.html";
+	var sendData = {};
+	sendData.cmd = "read1"
+	AFL.sendJson("Ajax10", sendData, game);
+}
+	// 初めからか、続きからかの選択およびデータ送信
+function kakunin(btnNo) {
+	if (btnNo == 1) {
+		link = "はじめから";
+		href = "story.html";
+		var sendData = {};
+		sendData.cmd = "read1"
+	} else {
+		link = "つづきから";
+		href = "story.html";
+		var sendData = {};
+		sendData.cmd = "read2"
+		sendData.userName = AFL.getCookie("USER_NAME")
 	}
-
-	function onClick()
-	{
-		var sendData = {"cmd":"read"};
-		sendData.ichiranRecv = {};
-		sendData.ichiranRecv.id = this.id;
-		AFL.sendJson("Ajax10",sendData,onRecv2);
-		//データ受信要求
-		//var sendData = {"cmd":"read3"};
-		//AFL.sendJson("Ajax10",sendData,onRecv3);
-
-	}
-
-//function Main()
-//{
-
-
-
+	location.href = href;
+}
+// function Main()
+// {
 	//セレクターで各要素のインスタンスを取得
 	//var output = document.querySelector("div.aaa");
 
@@ -41,7 +34,7 @@ function kakunin(btnNo){
 	//{
 		//内容のクリア
 
-		output.innerHTML = AFL.sprintf("%s",AFL.getCookie("USER_NAME"));
+		//output.innerHTML = AFL.sprintf("%s",AFL.getCookie("USER_NAME"));
 //		output.innerHTML += "<div id=news style=\"background-color: #000000;\">" +
 //				"<h2 style=\"color: #ffffff; font-family: \"ＭＳ 明朝\",serif;\">NEWS</h2> </div>";
 //		//output.innerHTML += "<br>";

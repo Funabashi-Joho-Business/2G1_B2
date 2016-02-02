@@ -5,6 +5,8 @@
 	height:600px;
 	border: 1px solid #000;
 	margin: 50px auto;
+	z-index: 1;
+	position: relative;
 }
 #aaa #login{
 	margin-top:280px;
@@ -12,12 +14,21 @@
 
 #bbb{
 	width:750px;
-	height:200px;
+	height:150px;
 	border:1px solid #000;
-	margin-top:380px;
+	margin-top:430px;
 	margin-left:24px;
 	font: bold large/150% "‚l‚r –¾’©";
+	color: #fff;
+	font-size: 20px;
+	background-color: rgba(51,00,51,0.40);
+	z-index: 0;
+	position: absolute;
 
+}
+
+#ccc{
+	position:absolute; top:20px; left:900px;
 }
 
 

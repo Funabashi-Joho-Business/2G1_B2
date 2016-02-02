@@ -14,19 +14,17 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.arnx.jsonic.JSON;
 
-class UserData
-{
+class UserData {
 	public String cmd;
 	public String name;
+	public int id;
+	// public int senario;
 }
 
-class PageNo
-{
+class PageNo {
 	public int id;
 	public String scenario;
 }
-
-
 
 @WebServlet("/Ajax10")
 public class Ajax10 extends HttpServlet {
@@ -34,26 +32,29 @@ public class Ajax10 extends HttpServlet {
 	private jp.ac.chibafjb.ajax10.Oracle mOracle;
 	private final String DB_ID = "x14g020";
 	private final String DB_PASS = "furutama0811";
+	public int senario;
+	public int q;
 
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public Ajax10() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public Ajax10() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
 	public void init() throws ServletException {
 		// TODO 自動生成されたメソッド・スタブ
 		super.init();
+		senario = 1;
 
-
-		try{
+		try {
 			mOracle = new Oracle();
 			mOracle.connect("ux4", DB_ID, DB_PASS);
 
-			//テーブルが無ければ作成
+			// テーブルが無ければ作成
 
-			if(!mOracle.isTable("User_DB")&& !mOracle.isTable("Scenario_DB"))
+			if (!mOracle.isTable("User_DB") && !mOracle.isTable("Scenario_DB"))
 
 			{
 				mOracle.execute("create table User_DB(name varchar2(10),id_2 number)");
@@ -66,167 +67,164 @@ public class Ajax10 extends HttpServlet {
 
 	@Override
 	public void destroy() {
-		//DB切断
+		// DB切断
 		mOracle.close();
 		// TODO 自動生成されたメソッド・スタブ
 		super.destroy();
 	}
+
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		action(request,response);
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		action(request, response);
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		action(request,response);
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		action(request, response);
 	}
+
 	private void action(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		//出力ストリームの作成
-        response.setCharacterEncoding("UTF-8");
-        response.setContentType("text/plain; charset=UTF-8");
-        PrintWriter out = response.getWriter();
+		// 出力ストリームの作成
+		response.setCharacterEncoding("UTF-8");
+		response.setContentType("text/plain; charset=UTF-8");
+		PrintWriter out = response.getWriter();
 
-    //データ受け取り
-        UserData userData = JSON.decode(request.getInputStream(),UserData.class);
+		// データ受け取り
+		UserData userData = JSON.decode(request.getInputStream(), UserData.class);
 
-        //はじめからのシナリオ読み込み
-        if(userData.cmd.equals("read1"))
-        {
-            	ArrayList<PageNo> list = new ArrayList<PageNo>();
-    			//DBからシナリオ読み込み
-    			ResultSet res = mOracle.query("select * from scenario_db where id_l = 1");
-    			try {
-					while(res.next())
-					{
+		ArrayList<PageNo> list = new ArrayList<PageNo>();
+
+		if (userData.cmd.equals("read1")) {
+				// userData.senario = 1;
+				senario = 1;
+				// DBからシナリオ読み込み
+				// はじめからのシナリオ読み込み
+
+				String sql = String.format(
+						"select * from scenario_db where id_l = '%d'",senario);
+				ResultSet res = mOracle.query(sql);
+				try {
+					while (res.next()) {
 						PageNo pageNo = new PageNo();
 						pageNo.id = res.getInt(1);
 						pageNo.scenario = res.getString(2);
 						list.add(pageNo);
 					}
-	    			//JSON形式に変換
-	                String json = JSON.encode(list);
-	                //出力
-	                out.println(json);
+					// JSON形式に変換
+					String json = JSON.encode(list);
+					// 出力
+					out.println(json);
 				} catch (SQLException e) {
 					// TODO 自動生成された catch ブロック
 					e.printStackTrace();
 				}
-    		}
+		}else if (userData.cmd.equals("read2")){
+			String sql_1 = String.format("select id_2 from user_db where name = '%s'",userData.name);
+			ResultSet res_1 = mOracle.query(sql_1);
+
+			try {
+				while (res_1.next()) {
+					senario = res_1.getInt(1);
+				}
+				String sql = String.format("select * from scenario_db where id_l = '%d'",senario);
+				ResultSet res = mOracle.query(sql);
+				try {
+					while (res.next()) {
+						PageNo pageNo = new PageNo();
+						pageNo.id = res.getInt(1);
+						pageNo.scenario = res.getString(2);
+						list.add(pageNo);
+					}
+					// JSON形式に変換
+					String json = JSON.encode(list);
+					// 出力
+					out.println(json);
+				} catch (SQLException e) {
+					// TODO 自動生成された catch ブロック
+					e.printStackTrace();
+				}
+
+			} catch (SQLException e) {
+				// TODO 自動生成された catch ブロック
+				e.printStackTrace();
+			}
+		} else if (userData.cmd.equals("read3")) {
+			// DBからシナリオ読み込み
+			// userData.senario = userData.senario + 1 ;
+			//　シナリオ進む
+			if(senario ==14){
+				senario = userData.id;
+			}else if(userData.id == 56){
+				senario = userData.id;
+			}else if(senario == 55 || senario == 64){
+				System.out.println("終了");
+			}else{
+			senario = senario + 1;
+			}
+
+			String sql = String.format("select * from scenario_db where id_l ='%d'", senario);
+			ResultSet res = mOracle.query(sql);
+			try {
+				while (res.next()) {
+					PageNo pageNo = new PageNo();
+					pageNo.id = res.getInt(1);
+					pageNo.scenario = res.getString(2);
+					list.add(pageNo);
+				}
+				// JSON形式に変換
+				String json = JSON.encode(list);
+				// 出力
+				out.println(json);
+			} catch (SQLException e) {
+				// TODO 自動生成された catch ブロック
+				e.printStackTrace();
+			}
+
+		} else if (userData.cmd.equals("read4")) {
+			// DBからシナリオ読み込み
+			//シナリオ戻る
+			// userData.senario = userData.senario + 1 ;
+			if(senario == 1 || senario ==16 || senario == 56){
+				System.out.println("戻れないよぉ～");
+			}else{
+
+			senario = senario - 1;
+
+			}
+
+//			System.out.println("userData.senario＝" + senario);
+
+			String sql = String.format("select * from scenario_db where id_l = '%d'", /* userData. */
+					senario);
+			ResultSet res = mOracle.query(sql);
+			try {
+				while (res.next()) {
+					PageNo pageNo = new PageNo();
+					pageNo.id = res.getInt(1);
+					pageNo.scenario = res.getString(2);
+					list.add(pageNo);
+				}
+				// JSON形式に変換
+				String json = JSON.encode(list);
+				// 出力
+				out.println(json);
+			} catch (SQLException e) {
+				// TODO 自動生成された catch ブロック
+				e.printStackTrace();
+			}
+
+		} else if(userData.cmd.equals("read5")) {
+			String sql = String.format("update user_db set id_2 ='%d' where name = '%s'",senario,userData.name);
+			mOracle.query(sql);
+		}
+
 	}
 }
-
-//
-//
-//
-//
-//        }else if(recvData.cmd.equals("read2"))
-//        {
-//        	 KijiSend kijiSend = new KijiSend();
-//            //記事内容一覧
-//            //記事の受け取り＆送信処理
-//            IchiranRecv ichiranRecv = recvData.ichiranRecv;
-//           // if("write".equals(ichiranRecv.id))
-//            {
-//            	String sql = String.format("select * from db_kigi where id = '%d' ",ichiranRecv.id);
-//            	ResultSet res = mOracle.query(sql);
-//            	try {
-//					if(res.next())
-//					{
-//
-//						kijiSend.title = res.getString(2);
-//						kijiSend.news = res.getString(3);
-//
-//					}
-//					res.close();
-//				} catch (JSONException e) {
-//					// TODO 自動生成された catch ブロック
-//					e.printStackTrace();
-//				} catch (SQLException e) {
-//					// TODO 自動生成された catch ブロック
-//					e.printStackTrace();
-//				}
-//
-//            }
-//
-//            try {
-//    			//データの送信処理
-//    			String sql = String.format("select * from db_exam where kiji_id = '%d'  order by com_id ",ichiranRecv.id);
-//    			ResultSet res = mOracle.query(sql);
-//    			while(res.next())
-//    			{
-//    				SendData sendData = new SendData();
-//    				sendData.id = res.getInt(2);
-//    				sendData.name = res.getString(3);
-//    				sendData.msg = res.getString(4);
-//    				kijiSend.list.add(sendData);
-//    			}
-//    			//JSON形式に変換
-//    	          String json2 = JSON.encode(kijiSend);
-//    	          //出力
-//    	            out.println(json2);
-//    			} catch (SQLException e) {
-//    				e.printStackTrace();
-//    			}
-//
-//        }else if(recvData.cmd.equals("read3"))
-//    	{
-//        	IchiranRecv ichiranRecv = recvData.ichiranRecv;
-//        	KijiSend kijiSend = new KijiSend();
-//		//データの受け取り処理
-//	       try {
-//				if(recvData.recv != null )
-//				{
-//					//RecvData ichiranRecv = new RecvData();
-//					//IchiranRecv ichiranRecv = recvData.ichiranRecv;
-//					//書き込み処理
-//					String sql = String.format("insert into db_exam values('%d',db_exam_seq.nextval,'%s','%s')",
-//							ichiranRecv.id,recvData.recv.name,recvData.recv.msg);
-//					mOracle.execute(sql);
-//				}
-//   			//データの送信処理
-//   			String sql = String.format("select * from db_exam where kiji_id = '%d'  order by com_id ",ichiranRecv.id);
-//   			ResultSet res = mOracle.query(sql);
-//   			while(res.next())
-//   			{
-//   				SendData sendData = new SendData();
-//   				sendData.id = res.getInt(1);
-//   				sendData.name = res.getString(3);
-//   				sendData.msg = res.getString(4);
-//   				kijiSend.list.add(sendData);
-//   			}
-//   			//JSON形式に変換
-//   	          String json2 = JSON.encode(kijiSend);
-//   	          //出力
-//   	            out.println(json2);
-//   			} catch (SQLException e) {
-//   				e.printStackTrace();
-//   			}
-//
-//
-//	     /* try {
-//			//データの送信処理
-//	    	  IchiranRecv ichiranRecv = recvData.ichiranRecv;
-//			ArrayList<SendData> list2 = new ArrayList<SendData>();
-//			String sql = String.format("select * from db_exam where kiji_id = '%d'  order by id ",ichiranRecv.id);
-//			ResultSet res = mOracle.query(sql);
-//			while(res.next())
-//			{
-//				SendData sendData = new SendData();
-//				sendData.id = res.getInt(1);
-//				sendData.name = res.getString(2);
-//				sendData.msg = res.getString(3);
-//				list2.add(sendData);
-//			}
-//			//JSON形式に変換
-//	          String json2 = JSON.encode(list2);
-//	          //出力
-//	            out.println(json2);
-//			} catch (SQLException e) {
-//				e.printStackTrace();
-//			}
-//*/
-//		}
